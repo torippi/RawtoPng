@@ -21,10 +21,17 @@ cv2.imwrite("./Image/Raw.png",img)
 height = 512
 width = 512
 NIR_Image = np.zeros((height, width), np.uint8)
+Red_Image = np.zeros((height, width), np.uint8)
+Blue_Image = np.zeros((height, width), np.uint8)
+Green_Image = np.zeros((height, width), np.uint8)
 NIR_Image[0][0:width] = img[0][0:width]
 for i in range(Rawlen):
     if i % 2 == 0:
         NIR_Image[i//2][0:width] = img[i][0:width]
+        Green_Image[i//2][0:width] = img[i][512:1024]
+    else:
+        Red_Image[i//2][0:width] = img[i][0:width]
+        Blue_Image[i//2][0:width] = img[i][512:1024]
 
 # png画像と比較してできたか確認
 # 同一画像化確認　Ture なら一緒
@@ -33,3 +40,15 @@ OriR = cv2.imread("./Image/Red.png",cv2.IMREAD_GRAYSCALE) # Red
 OriB = cv2.imread("./Image/Blue.png",cv2.IMREAD_GRAYSCALE) # Blue
 OriG = cv2.imread("./Image/Green.png",cv2.IMREAD_GRAYSCALE) # Green
 print(np.array_equal(OriN, NIR_Image))
+print(np.array_equal(OriR, Red_Image))
+print(np.array_equal(OriB, Blue_Image))
+print(np.array_equal(OriG, Green_Image))
+
+cv2.imwrite("./Image/NIR_Image.png",NIR_Image)
+cv2.imwrite("./Image/Green_Image.png",Green_Image)
+cv2.imwrite("./Image/Red_Image.png",Red_Image)
+cv2.imwrite("./Image/Blue_Image.png",Blue_Image)
+
+## 4波長の画像はまったく一緒だったよ
+
+
