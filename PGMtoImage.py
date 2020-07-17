@@ -7,48 +7,41 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # Rawファイルの読み込み
-Rawlen = 1024
-rawpath = "./Image/prefix_0.raw"
-fd = open(rawpath, 'rb')
-f = np.fromfile(fd, dtype=np.int16, count=Rawlen*Rawlen)
-img = f.reshape((Rawlen,Rawlen))
-fd.close()
+FN = 7831
+for i in range(1800):
+    print(str(i+1) + "枚目")
+    Rawlen = 1024
+    rawpath = "../Rawdata/First/prefix_{}".format(i)+"_1024x1024_2B_LE_FN{}".format(FN)+"_FD0_FS0.raw"
+    while os.path.exists(rawpath) == False:
+        print("フレームが抜けてる")
+        FN = FN + 1
+        rawpath = "../Rawdata/First/prefix_{}".format(i)+"_1024x1024_2B_LE_FN{}".format(FN)+"_FD0_FS0.raw"
+    fd = open(rawpath, 'rb')
+    f = np.fromfile(fd, dtype=np.int16, count=Rawlen*Rawlen)
+    img = f.reshape((Rawlen,Rawlen))
+    fd.close()
 
-# Raw.pngの作成
-cv2.imwrite("./Image/Raw.png",img)
+    # Raw.pngの作成
+    cv2.imwrite("../Convert/First/Raw/{:0=4}".format(i)+".png",img)
 
-# NIR画像の作成
-height = 512
-width = 512
-NIR_Image = np.zeros((height, width), np.uint8)
-Red_Image = np.zeros((height, width), np.uint8)
-Blue_Image = np.zeros((height, width), np.uint8)
-Green_Image = np.zeros((height, width), np.uint8)
-NIR_Image[0][0:width] = img[0][0:width]
-for i in range(Rawlen):
-    if i % 2 == 0:
-        NIR_Image[i//2][0:width] = img[i][0:width]
-        Green_Image[i//2][0:width] = img[i][512:1024]
-    else:
-        Red_Image[i//2][0:width] = img[i][0:width]
-        Blue_Image[i//2][0:width] = img[i][512:1024]
+    # NIR画像の作成
+    height = 512
+    width = 512
+    NIR_Image = np.zeros((height, width), np.uint8)
+    Red_Image = np.zeros((height, width), np.uint8)
+    Blue_Image = np.zeros((height, width), np.uint8)
+    Green_Image = np.zeros((height, width), np.uint8)
+    for q in range(Rawlen):
+        if q % 2 == 0: #0,2,4,6,8,...
+            NIR_Image[q//2][0:width] = img[q][np.arange(0, 1024, 2)]
+            Green_Image[q//2][0:width] = img[q][np.arange(1, 1024, 2)]
+        else: #1,3,5,7,9,...
+            Red_Image[q//2][0:width] = img[q][np.arange(0, 1024, 2)]
+            Blue_Image[q//2][0:width] = img[q][np.arange(1, 1024, 2)]
 
-# png画像と比較してできたか確認
-# 同一画像化確認　Ture なら一緒
-OriN = cv2.imread("./Image/NIR.png",cv2.IMREAD_GRAYSCALE) # NIR
-OriR = cv2.imread("./Image/Red.png",cv2.IMREAD_GRAYSCALE) # Red
-OriB = cv2.imread("./Image/Blue.png",cv2.IMREAD_GRAYSCALE) # Blue
-OriG = cv2.imread("./Image/Green.png",cv2.IMREAD_GRAYSCALE) # Green
-print(np.array_equal(OriN, NIR_Image))
-print(np.array_equal(OriR, Red_Image))
-print(np.array_equal(OriB, Blue_Image))
-print(np.array_equal(OriG, Green_Image))
-
-cv2.imwrite("./Image/NIR_Image.png",NIR_Image)
-cv2.imwrite("./Image/Green_Image.png",Green_Image)
-cv2.imwrite("./Image/Red_Image.png",Red_Image)
-cv2.imwrite("./Image/Blue_Image.png",Blue_Image)
-
-## 4波長の画像はまったく一緒だったよ
-
+    cv2.imwrite("../Convert/First/NIR/{:0=4}".format(i)+".png",NIR_Image)
+    cv2.imwrite("../Convert/First/Red/{:0=4}".format(i)+".png",Red_Image)
+    cv2.imwrite("../Convert/First/Blue/{:0=4}".format(i)+".png",Blue_Image)
+    cv2.imwrite("../Convert/First/Green/{:0=4}".format(i)+".png",Green_Image)
+    FN = FN + 1
 
