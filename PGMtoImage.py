@@ -1,4 +1,5 @@
 # RAWtoImage(NIR,RGB)画像に分割する用
+# たくさんのファイルを一括
 # バイナリを開いてファイルを変換
 
 import cv2
@@ -6,16 +7,17 @@ import os
 import numpy as np
 import matplotlib.pyplot as plt
 
+# Rawフォルダの読み込み
 # Rawファイルの読み込み
 Rawlen = 1024
-rawpath = "./Image/prefix_0.raw"
+rawpath = "../Rawdata/First/prefix_0_1024x1024_2B_LE_FN7831_FD0_FS0.raw"
 fd = open(rawpath, 'rb')
 f = np.fromfile(fd, dtype=np.int16, count=Rawlen*Rawlen)
 img = f.reshape((Rawlen,Rawlen))
 fd.close()
 
 # Raw.pngの作成
-cv2.imwrite("./Image/Raw.png",img)
+cv2.imwrite("../Convert/First/Raw/0001.png",img)
 
 # NIR画像の作成
 height = 512
@@ -33,15 +35,7 @@ for i in range(Rawlen):
         Red_Image[i//2][0:width] = img[i][0:width]
         Blue_Image[i//2][0:width] = img[i][512:1024]
 
-# png画像と比較してできたか確認
-# 同一画像化確認　Ture なら一緒
-OriN = cv2.imread("./Image/NIR.png",cv2.IMREAD_GRAYSCALE) # NIR
-OriR = cv2.imread("./Image/Red.png",cv2.IMREAD_GRAYSCALE) # Red
-OriB = cv2.imread("./Image/Blue.png",cv2.IMREAD_GRAYSCALE) # Blue
-OriG = cv2.imread("./Image/Green.png",cv2.IMREAD_GRAYSCALE) # Green
-print(np.array_equal(OriN, NIR_Image))
-print(np.array_equal(OriG, Green_Image))
-print(np.array_equal(OriR, Red_Image))
-print(np.array_equal(OriB, Blue_Image))
-
-# まったく同じ画像が生成できた。
+cv2.imwrite("../Convert/First/NIR/0001.png",NIR_Image)
+cv2.imwrite("../Convert/First/Red/0001.png",Red_Image)
+cv2.imwrite("../Convert/First/Blue/0001.png",Blue_Image)
+cv2.imwrite("../Convert/First/Green/0001.png",Green_Image)
